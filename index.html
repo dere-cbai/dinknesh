@@ -229,17 +229,23 @@
         </div>
 
         <div class="input-container">
-            <br>
-            <!-- <br> -->
-
             <p class="subtitle" style="font-size: 1.5em;">Try it with one of the following options</p>
             <div class="upload-options">
-                <div class="upload-button">🖼️ Upload Image</div>
-                <div class="upload-button">🎥 Upload Video</div>
-                <div class="upload-button">⏺️ Record Video</div>
-                <div class="upload-button">🎵 Upload Audio</div>
-                <div class="upload-button">🎙️ Record Audio</div>
-                <div class="upload-button">📄 Upload PDF</div>
+                <label class="upload-button" for="imageUpload">🖼️ Upload Image</label>
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                
+                <label class="upload-button" for="videoUpload">🎥 Upload Video</label>
+                <input type="file" id="videoUpload" accept="video/*" style="display: none;">
+                
+                <button class="upload-button" id="recordVideo">⏺️ Record Video</button>
+                
+                <label class="upload-button" for="audioUpload">🎵 Upload Audio</label>
+                <input type="file" id="audioUpload" accept="audio/*" style="display: none;">
+                
+                <button class="upload-button" id="recordAudio">🎙️ Record Audio</button>
+                
+                <label class="upload-button" for="pdfUpload">📄 Upload PDF</label>
+                <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
             </div>
             
             <textarea class="message-input" placeholder="Enter text eg. ድinቅneሽ Large Multi-Modal Model 😊"></textarea>
@@ -280,6 +286,52 @@
             button.addEventListener('click', () => {
                 console.log('Action clicked:', button.textContent);
             });
+        });
+
+        // File upload handling
+        function handleFileUpload(event, fileType) {
+            const file = event.target.files[0];
+            if (file) {
+                console.log(`${fileType} uploaded:`, file.name);
+                // Here you would typically send the file to your server or process it
+            }
+        }
+
+        document.getElementById('imageUpload').addEventListener('change', (e) => handleFileUpload(e, 'Image'));
+        document.getElementById('videoUpload').addEventListener('change', (e) => handleFileUpload(e, 'Video'));
+        document.getElementById('audioUpload').addEventListener('change', (e) => handleFileUpload(e, 'Audio'));
+        document.getElementById('pdfUpload').addEventListener('change', (e) => handleFileUpload(e, 'PDF'));
+
+        // Video recording
+        document.getElementById('recordVideo').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                console.log('Video recording started');
+                // Here you would typically start recording the stream
+                // For now, we'll just log it and stop the stream after 3 seconds
+                setTimeout(() => {
+                    stream.getTracks().forEach(track => track.stop());
+                    console.log('Video recording stopped');
+                }, 3000);
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+            }
+        });
+
+        // Audio recording
+        document.getElementById('recordAudio').addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                console.log('Audio recording started');
+                // Here you would typically start recording the stream
+                // For now, we'll just log it and stop the stream after 3 seconds
+                setTimeout(() => {
+                    stream.getTracks().forEach(track => track.stop());
+                    console.log('Audio recording stopped');
+                }, 3000);
+            } catch (err) {
+                console.error('Error accessing microphone:', err);
+            }
         });
     </script>
 </body>
