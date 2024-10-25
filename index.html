@@ -231,21 +231,12 @@
         <div class="input-container">
             <p class="subtitle" style="font-size: 1.5em;">Try it with one of the following options</p>
             <div class="upload-options">
-                <label class="upload-button" for="imageUpload">🖼️ Upload Image</label>
-                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
-                
-                <label class="upload-button" for="videoUpload">🎥 Upload Video</label>
-                <input type="file" id="videoUpload" accept="video/*" style="display: none;">
-                
-                <button class="upload-button" id="recordVideo">⏺️ Record Video</button>
-                
-                <label class="upload-button" for="audioUpload">🎵 Upload Audio</label>
-                <input type="file" id="audioUpload" accept="audio/*" style="display: none;">
-                
-                <button class="upload-button" id="recordAudio">🎙️ Record Audio</button>
-                
-                <label class="upload-button" for="pdfUpload">📄 Upload PDF</label>
-                <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
+                <div class="upload-button">🖼️ Upload Image</div>
+                <div class="upload-button">🎥 Upload Video</div>
+                <div class="upload-button">⏺️ Record Video</div>
+                <div class="upload-button">🎵 Upload Audio</div>
+                <div class="upload-button">🎙️ Record Audio</div>
+                <div class="upload-button">📄 Upload PDF</div>
             </div>
             
             <textarea class="message-input" placeholder="Enter text eg. ድinቅneሽ Large Multi-Modal Model 😊"></textarea>
@@ -259,6 +250,8 @@
     <script>
         const darkModeToggle = document.getElementById('darkModeToggle');
         const body = document.body;
+        const messageInput = document.querySelector('.message-input');
+        const outputContainer = document.getElementById('output');
 
         darkModeToggle.addEventListener('click', () => {
             body.classList.toggle('dark-mode');
@@ -276,61 +269,69 @@
             body.classList.remove('dark-mode');
         }
 
-        document.querySelectorAll('.upload-button').forEach(button => {
-            button.addEventListener('click', () => {
-                console.log('Button clicked:', button.textContent);
-            });
-        });
+        // Function to handle file uploads
+        function handleFileUpload(fileType) {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = fileType;
+            input.click();
 
-        document.querySelectorAll('.action-button').forEach(button => {
-            button.addEventListener('click', () => {
-                console.log('Action clicked:', button.textContent);
+            input.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    // Here you would typically send the file to your server or process it
+                    outputContainer.textContent = `Uploaded ${fileType} file: ${file.name}`;
+                }
             });
-        });
-
-        // File upload handling
-        function handleFileUpload(event, fileType) {
-            const file = event.target.files[0];
-            if (file) {
-                console.log(`${fileType} uploaded:`, file.name);
-                // Here you would typically send the file to your server or process it
-            }
         }
 
-        document.getElementById('imageUpload').addEventListener('change', (e) => handleFileUpload(e, 'Image'));
-        document.getElementById('videoUpload').addEventListener('change', (e) => handleFileUpload(e, 'Video'));
-        document.getElementById('audioUpload').addEventListener('change', (e) => handleFileUpload(e, 'Audio'));
-        document.getElementById('pdfUpload').addEventListener('change', (e) => handleFileUpload(e, 'PDF'));
-
-        // Video recording
-        document.getElementById('recordVideo').addEventListener('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                console.log('Video recording started');
-                // Here you would typically start recording the stream
-                // For now, we'll just log it and stop the stream after 3 seconds
-                setTimeout(() => {
-                    stream.getTracks().forEach(track => track.stop());
-                    console.log('Video recording stopped');
-                }, 3000);
-            } catch (err) {
-                console.error('Error accessing camera:', err);
-            }
+        // Handle upload button clicks
+        document.querySelectorAll('.upload-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const buttonText = button.textContent.trim();
+                switch (buttonText) {
+                    case '🖼️ Upload Image':
+                        handleFileUpload('image/*');
+                        break;
+                    case '🎥 Upload Video':
+                        handleFileUpload('video/*');
+                        break;
+                    case '⏺️ Record Video':
+                        outputContainer.textContent = 'Video recording feature not implemented yet.';
+                        break;
+                    case '🎵 Upload Audio':
+                        handleFileUpload('audio/*');
+                        break;
+                    case '🎙️ Record Audio':
+                        outputContainer.textContent = 'Audio recording feature not implemented yet.';
+                        break;
+                    case '📄 Upload PDF':
+                        handleFileUpload('.pdf');
+                        break;
+                }
+            });
         });
 
-        // Audio recording
-        document.getElementById('recordAudio').addEventListener('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                console.log('Audio recording started');
-                // Here you would typically start recording the stream
-                // For now, we'll just log it and stop the stream after 3 seconds
-                setTimeout(() => {
-                    stream.getTracks().forEach(track => track.stop());
-                    console.log('Audio recording stopped');
-                }, 3000);
-            } catch (err) {
-                console.error('Error accessing microphone:', err);
+        // Handle action button clicks
+        document.querySelectorAll('.action-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const buttonText = button.textContent.trim();
+                messageInput.value = buttonText;
+                outputContainer.textContent = `Processing request: "${buttonText}"`;
+                // Here you would typically send the request to your AI model
+            });
+        });
+
+        // Handle message input
+        messageInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                const message = messageInput.value.trim();
+                if (message) {
+                    outputContainer.textContent = `Processing message: "${message}"`;
+                    // Here you would typically send the message to your AI model
+                    messageInput.value = '';
+                }
             }
         });
     </script>
